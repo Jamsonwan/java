@@ -188,6 +188,61 @@
 * 清除方法（cleaner）没有终结方法那么危险，但仍然是不可预测、运行缓慢，一般情况下也是不必要的。
 * finalizer和cleaner的缺点在于不能保证被及时执行。
   
+### 9. try-with-resources 优先于try-finally
+* 主要针对资源的关闭
+* try-finally 当有多个资源需要关闭时，就不太适用，另外存在异常覆盖
+  ```java
+    static String fisrtLineOfFile(String path) throws IOException{
+        BufferedReader br = new BufferdReader(new FileReader(path));
+        try{
+            return br.readLine();
+        }finally{
+            br.close();
+        }
+    }
+  ```
+* try-with-resources 需要实现AutoCloseable接口
+  ```java
+      // the best way to cloase resources
+      static String fisrtLineOfFile(String path) throws IOException{
+          try(BufferedReader br = new new BufferdReader(new FileReader(path))){
+              return br.readLine();
+          }
+      }
 
+      // try-with-resources on multiple resources
+      static void copy(String src, String dst) throws IOException{
+          try(InputStream in = new FileInputStream(src); OutputStream out = new FileOutputStream(dst){
+                  byte[] buf = new byte[BUFFER_SIZE];
+                  int n;
+                  while ((n == in.read(buf)) >= 0)
+                      out.write(buf, 0, n);
+              }
+          }
+      }
+   ```
+   
 
+***
+## 二、对于所有对象都通用的方法
 
+### 10、覆盖equals时请遵守通用约定
+* 与默认equals方法等效
+  * 类的每个实例本质上都是唯一的
+  * 类没必要提供“逻辑相等”的测试功能
+  * 超类已经覆盖了equals，超类的行为对于这个类也是合适的
+  * 类是私有的，或者是包级私有的，可以确定它的equals方法永远不会被调用
+* 覆盖equals的需求：
+  * 类具有自己独特的“逻辑相等”，而且超累还没有覆盖equals（值类）
+  * 如 Integer、String
+* 覆盖equals方法必须遵守的通用约定
+  * 自反性。x.equals(x)返回true
+  * 对称性。x.equals(y) == y.equals(x)
+  * 传递性。x.equals(y),y.equals(z) x.equals(z)
+  * 一致性。多次操作结果一样
+  * x.equals(null) return false
+* 实现高质量equals方法
+  * step1：使用 == 操作符检查“参数是否为这个对象的引用”，如果是，返回true；
+  * step2：使用instanceof操作符检查“参数是否为正确的类型”，如果不是，返回false；
+  * step3：把参数转换成正确的类型（强制转换）；
+  * step4：对于该类中的每个“关键”域，检查参数中的域是否是域该对象中对应的域相匹配。
