@@ -40,7 +40,7 @@
 * 合并分支 git merge branchName (把branchName合并到当前分支)
   * 冲突需要手动删除和保留信息
 
-## GItHub
+## GitHub
 
 * 创建别名
   * git remote git-demo https://github.com/Jamsonwan/git-demo.git
@@ -55,3 +55,9 @@
 
 * 免密钥登录
   * ssh -keygen -t rsa -C JamsonWan92@gmail.com
+
+## .Ignore
+* 直接写名字
+  * venv
+  * .gitignore
+  * .idea/
