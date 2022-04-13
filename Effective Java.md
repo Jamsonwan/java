@@ -246,3 +246,66 @@
   * step2：使用instanceof操作符检查“参数是否为正确的类型”，如果不是，返回false；
   * step3：把参数转换成正确的类型（强制转换）；
   * step4：对于该类中的每个“关键”域，检查参数中的域是否是域该对象中对应的域相匹配。
+* 对于float和double类型，使用Float.Compare(float, float),Double.compare(double, double),因为存在Float.NaN、-0.0f以及类似的double常量
+    ```java
+        public final class PhoneNumber{
+            private final short areaCode, prefix, lineNumber;
+
+            public PhoneNumber(int areaCode, int prefix, int lineNumer){
+                this.areaCode = areaCode;
+                this.prefix = prefix;
+                this.lineNumber = lineNumber;
+            }
+
+            private static short rangeCheck(int val, int max, String arg){
+                if (val < 0 || val > max)
+                    throw new IlleagArgumentException(arg + ":" + val);
+                return (short) val;
+            }
+
+            @Override public boolean equals(Object o){
+                // step1
+                if(o == this) 
+                    return true;
+                
+                // step2
+                if (!(o instanceof PhoneNumber)) 
+                    return false;
+
+                // step3
+                PhoneNumber pn = (PhoneNumber) o;
+                
+                // step 4 先比较最有可能不一致 或开销较小的
+                return pn.lineNum == lineNumber && pb.prefix == prefix && pn.areaCode == areaCode;
+            }
+        }
+    ```
+* 注意：
+  * 覆盖equals时总要覆盖hashCode。
+  * 不要企图让equals方法过于智能。
+  * 不要将equals声明中的Object对象替换为其它的类型。（重载会导致没有覆盖Object类的方法）
+* 不要轻易覆盖equals方法
+  
+### 11、覆盖equals时总要覆盖hashCode
+* 在每个覆盖了equals方法的类中，都必须覆盖hashCode方法。
+* 相等的对象必须有相等的散列码（hashCode）---如hashMap的应用需求
+* hashCode不同，代表两个对象没有任何共同之处。
+* AutoValue框架
+    ```java
+        // Typical hashCode method
+        @Override
+        public int hashCode(){
+            int result = Short.hashCode(area);
+            result = 31 * result + Short.hashCode(prefix);
+            result = 31 * result + Short.hashCode(lineNumber);
+            return result;
+        }
+    ```
+* 不要试图从散列码计算中排除一个对象的关键域来提高性能
+
+### 12、始终要覆盖toString
+* toString方法应该返回对象中包含的值得关注的信息
+* 每一个可实例化的类中覆盖Object的toString实现
+
+### 13、谨慎地覆盖clone
+
